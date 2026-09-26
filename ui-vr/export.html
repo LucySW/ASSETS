@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>CircuitoVR — exportador de ícones</title>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"
+} }
+</script>
+<style>body { margin: 0; background: #0a1030; color: #cfe0ff; font: 14px sans-serif; }</style>
+</head>
+<body>
+<canvas id="gl" style="display:none"></canvas>
+<p>Página usada por <code>tools/export.mjs</code>. Abra <code>showcase.html</code> para ver a vitrine.</p>
+<script type="module">
+import { ICONS } from './src/icons.js';
+import { Stage, instantiate, exportGLB } from './src/stage.js';
+import * as Plates from './src/plates.js';
+
+const stage = new Stage(document.getElementById('gl'), { size: 512, supersample: 2 });
+const cache = new Map();
+const inst = (id) => { if (!cache.has(id)) cache.set(id, instantiate(id)); return cache.get(id); };
+const png = (c) => c.toDataURL('image/png');
+const b64 = (buf) => {
+  let s = ''; const u = new Uint8Array(buf);
+  for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000));
+  return btoa(s);
+};
+
+window.api = {
+  icons: () => ICONS.map(({ id, label, use, group }) => ({ id, label, use, group })),
+  styles: () => Plates.STYLE_NAMES,
+  iconPNG: (id, h = 0, t = 0, size = 512) => png(stage.sprite(inst(id), { t, h, size })),
+  sheetPNG: (id, cols = 4, rows = 4, cell = 256) => png(stage.sheet(inst(id), { cols, rows, cell })),
+  glb: async (id) => { const r = await exportGLB(id); return { data: b64(r.buffer), tracks: r.tracks }; },
+  plate: (kind, style, state) => png(Plates.plate(kind, style, state)),
+  glow: (kind, style) => png(Plates.glow(kind, style)),
+  button: (id, style, state) => png(Plates.button(
+    stage.sprite(inst(id), { h: state === 'hover' ? 1 : 0 }), style, state)),
+  preview: (spec) => png(Plates.previewSheet(spec, (id, h) => stage.sprite(inst(id), { h }))),
+};
+window.ready = true;
+</script>
+</body>
+</html>
