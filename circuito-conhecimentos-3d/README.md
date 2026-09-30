@@ -11,7 +11,7 @@ python3 -m http.server 8000
 # depois abra http://localhost:8000
 ```
 
-A cena abre na **Última referência** (de costas para a entrada do Circuito, com o arco à esquerda e a rua das motos à frente). Os botões do painel levam às outras vistas, e **Caminhar** ativa o modo primeira pessoa (W A S D, Shift corre, Esc sai). Também dá para abrir direto numa vista com `?view=`: `ultima`, `entrada`, `panorama`, `aerea`, `geral`, `patio13`, `blocos45`, `bloco8`, `varandas`, `murais`.
+A cena abre na vista **Frente (foto 10)**: quem sai pelos arcos coloridos, de costas para o Circuito, olhando o prédio dos murais do outro lado da rua. **Direita (foto 11)** e **Esquerda (foto 12)** são as vistas laterais a partir desse mesmo ponto: o prédio das varandas redondas e a rua das motos com o arco no canto. Os outros botões levam às demais fotos, e **Caminhar** ativa o modo primeira pessoa (W A S D, Shift corre, Esc sai). Também dá para abrir direto numa vista com `?view=`: `frente`, `direita`, `esquerda`, `entrada`, `panorama`, `aerea`, `geral`, `patio13`, `blocos45`, `bloco8`.
 
 ## Escala e medidas
 
@@ -24,7 +24,8 @@ A cena abre na **Última referência** (de costas para a entrada do Circuito, co
 | Módulo B (blocos 4, 5, 6) | x −24,5 a −10,9 |
 | Módulo C (blocos 7, 8) | x −45,4 a −31 |
 | Arco arco-íris | 9 pórticos a cada 0,62 m, vão de 4,5 m, 3,8 a 4,35 m de altura |
-| Rua de saída (foto 12) | 8 m de largura, 17° à esquerda do eixo noroeste |
+| Rua em frente ao arco (fotos 10 a 12) | 8 m de largura, sai da ponta da ilha para o noroeste, 17° à esquerda |
+| Prédio dos murais | 12 m × 17 m (com a ala recuada), 3,5 m de parede, em frente à saída do arco |
 
 Eixos: +X aponta para o arco de entrada (nordeste), +Z para a rua sudeste e o prédio das varandas.
 
