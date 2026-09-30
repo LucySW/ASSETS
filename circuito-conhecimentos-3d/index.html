@@ -257,8 +257,8 @@ function RP(s,u){return [ROAD_O[0]-Math.sin(ROAD_TH)*s+Math.cos(ROAD_TH)*u, ROAD
 function roadBox(s0,s1,u0,u1,h,col,y=0){const [x,z]=RP((s0+s1)/2,(u0+u1)/2);B.box(u1-u0,h,s1-s0,x,y,z,col,ROAD_TH,.04);}
 function roadGroup(s,u){const g=new THREE.Group();const [x,z]=RP(s,u);g.position.set(x,0,z);g.rotation.y=ROAD_TH;scene.add(g);g.updateMatrixWorld();return g;}
 // contorno da ilha do Circuito (medido na aérea)
-const EDGE_NW=[[-62,-4],[-46,-5.3],[-32,-8],[-25,-8.8],[-12,-9.4],[-3,-10.8],[10,-11.2],[13,-15.2],[22,-15.5],[26,-11.8],[30,-10.2],[33.5,-7]];
-const EDGE_SE=[[-62,12],[-50,12.5],[-40,12],[-25,10.5],[-10,9],[0,7.5],[12,6.2],[22,5],[30,5],[33.5,3]];
+const EDGE_NW=[[-62,-9.6],[-46,-11.1],[-32,-11.3],[-12,-11.3],[-3,-11.4],[10,-11.6],[13,-15.2],[22,-15.5],[26,-11.8],[29.4,-12.2],[30.4,-9.1],[31.4,-6.0],[32.4,-2.9]];
+const EDGE_SE=[[-62,12],[-50,12.5],[-40,12],[-25,10.5],[-10,9.4],[0,9.3],[12,8.8],[22,6.6],[30,5],[33.5,3]];
 
 // terreno geral (grama seca) e asfalto
 {
@@ -275,7 +275,7 @@ const EDGE_SE=[[-62,12],[-50,12.5],[-40,12],[-25,10.5],[-10,9],[0,7.5],[12,6.2],
   const g=new THREE.ExtrudeGeometry(sh,{depth:0.15,bevelEnabled:false}); g.rotateX(-PI/2);
   B.add(g,'#6f7c47',[0,0,0],[0,0,0],[1,1,1],.05);
   // meio-fio pintado de branco na frente da entrada
-  B.box(0.25,0.17,10,33.45,0,0,C.curb);
+  B.box(0.25,0.17,6.2,33.45,0,0.6,C.curb);
 }
 // canteiros de terra/grama no entorno
 function bed(x0,x1,z0,z1,col=C.grass,h=0.14,y=0){B.box(x1-x0,h,z1-z0,(x0+x1)/2,y,(z0+z1)/2,col,0,.08);}
@@ -290,14 +290,10 @@ bed(36,90,10,36,'#b6b2a8',0.15);         // calçada/pátio do prédio das varan
 bed(-100,-35,21.6,32,'#7d7a4c');
 
 // ---------- piso intertravado do Circuito ----------
-paved(-62,-45.4,-4.3,11.2);    // praça sudoeste (bloco 8)
-paved(-45.4,-30.5,-5.2,9.6);   // módulo C (blocos 7 e 8)
-paved(-31,-24.5,-7.6,9.2);     // pátio entre C e B
-paved(-24.5,-10.5,-8.6,8.0);   // módulo B (blocos 4, 5, 6)
-paved(-12,-2.2,-9.2,7.3);      // pátio entre B e A
-paved(-2.5,11.5,-10.6,5.2);    // módulo A (blocos 1, 2, 3)
-paved(11,30,-10.2,4.6);        // praça de entrada
-paved(30,33.4,-7.1,-2.9);      // passagem sob o arco
+paved(-62,-45.8,-9.2,11.2);    // praça sudoeste (bloco 8)
+paved(-46,12,-10.8,8.9);       // os três módulos e o corredor
+paved(11.5,30,-10.6,4.8);      // praça de entrada
+for(let x=30;x<32.6;x+=0.2) paved(x,x+0.2,Math.max(-9.6,-12.2+3.1*(x-29.4)+0.15),-2.3);   // passagem sob o arco (borda diagonal da rua)
 {
   const g=mergeGeometries(PAV); const m=new THREE.Mesh(g,pavMat); m.receiveShadow=true; scene.add(m);
 }
@@ -308,15 +304,10 @@ function tact(x0,z0,x1,z1,w=0.4){
   B.box(L+w,0.02,w,(x0+x1)/2,0.16,(z0+z1)/2,C.yellow,Math.atan2(-dz,dx));
 }
 function tactPath(pts){for(let i=0;i<pts.length-1;i++)tact(...pts[i],...pts[i+1]);}
-tactPath([[33.3,-3.9],[24.6,-3.9],[24.6,0.9],[12.2,0.9]]);
-tactPath([[33.3,-6.7],[24.6,-6.7],[24.6,-3.9]]);
-tactPath([[12.2,0.9],[12.2,-1.4],[1.4,-1.4]]);
-tactPath([[9.6,-4.6],[1.4,-4.6]]);
-tactPath([[-2.4,-2.4],[-11.5,-2.4],[-11.5,1.8],[-24.5,1.8],[-27,1.8],[-27,2.6],[-45.2,2.6]]);
-tactPath([[-45.6,2.6],[-60,2.6]]);
-tactPath([[-27,1.8],[-27,-5.5],[-29.5,-5.5]]);
-tactPath([[-60,-2.8],[-47,-2.8]]);
-for(const[x,z]of[[24.6,-3.9],[24.6,0.9],[12.2,0.9],[-11.5,1.8],[-27,2.6],[33,-3.9],[33,-6.7]]) B.box(0.8,0.022,0.8,x,0.16,z,C.yellow);
+tactPath([[33.3,-4.0],[-44.6,-4.0]]);                       // linha-guia do arco até o fundo do corredor
+tactPath([[30.7,-8.4],[25,-8.4],[25,-4.0]]);
+tactPath([[-47,-1.5],[-60,-1.5]]);
+for(const[x,z]of[[25,-4.0],[25,-8.4],[33,-4.0],[30.5,-8.4],[-44.6,-4.0],[11.4,-4.0],[-2.2,-4.0],[-10.9,-4.0],[-24.5,-4.0],[-31,-4.0]]) B.box(0.8,0.022,0.8,x,0.16,z,C.yellow);
 
 // ---------- vegetação ----------
 function tree(x,z,h=7,r=3.5,kind='round',y=0.15){
@@ -392,7 +383,22 @@ function planter(x0,x1,z0,z1,h=0.6,plants='shrub',y=0.15){
   }
   if(plants==='grass') B.box(w-2*t,0.03,d-2*t,cx,top,cz,C.grass,0,.1);
 }
-function lawn(x0,x1,z0,z1,y=0.15){B.box(x1-x0,0.12,z1-z0,(x0+x1)/2,y,(z0+z1)/2,C.grass,0,.1);B.box(x1-x0+0.16,0.08,z1-z0+0.16,(x0+x1)/2,y,(z0+z1)/2,C.concrete);}
+// jardim rente ao chão: meio-fio baixo de concreto e terra/grama no nível do piso
+function gbed(x0,x1,z0,z1,plants='grass',curb=C.concrete,y=0.15){
+  const cx=(x0+x1)/2,cz=(z0+z1)/2,w=x1-x0,d=z1-z0,t=0.1;
+  B.box(w,0.07,t,cx,y,z0+t/2,curb);B.box(w,0.07,t,cx,y,z1-t/2,curb);
+  B.box(t,0.07,d-2*t,x0+t/2,y,cz,curb);B.box(t,0.07,d-2*t,x1-t/2,y,cz,curb);
+  B.box(w-2*t,0.04,d-2*t,cx,y,cz,plants==='grass'?C.grass:C.soil,0,.1);
+  const top=y+0.04;
+  if(plants==='grass'||plants==='soil') return;
+  const n=Math.max(1,Math.round(w*d/1.2));
+  for(let i=0;i<n;i++){
+    const px=R(x0+.3,x1-.3),pz=R(z0+.3,z1-.3);
+    if(plants==='dracena'){ if(rand()<.5) dracena(px,top,pz,R(1.2,2.4)); else grassTuft(px,top,pz,R(.6,1)); }
+    else shrub(px,top,pz,R(.3,.55));
+  }
+}
+function lawn(x0,x1,z0,z1,y=0.15){gbed(x0,x1,z0,z1,'grass',C.concrete,y);}
 function roundPlanter(x,z,r=1.2,withBenches=true,treeH=2.2){
   B.cyl(r,r,0.65,20,x,0.15,z,C.concrete,.02);
   B.cyl(r-0.15,r-0.15,0.02,20,x,0.8,z,C.grassD);
@@ -447,7 +453,7 @@ function bar(o){
   // números
   for(const [key,face,xf] of [['numNE','px',x1],['numSW','nx',x0]]){
     const nm=o[key]; if(!nm) continue;
-    decal(numberTex(nm.t,nm.c),2.0,2.5,xf+(face==='px'?0.03:-0.03),Y0+1.95,cz+(nm.dz||0),FACE[face],{transparent:true});
+    decal(numberTex(nm.t,nm.c),2.0,2.5,xf+(face==='px'?0.03:-0.03),Y0+1.95,cz+(nm.dz??s*0.9),FACE[face],{transparent:true});
   }
   if(o.fullClad){ // ponta inteira revestida (bloco 8 rosa / bloco 7 azul-petróleo)
     const f=o.fullClad; const xf=f.face==='nx'?x0-0.02:x1+0.02;
@@ -467,66 +473,69 @@ function connector(x0,x1,zA,zB,opts={}){
     for(let i=0;i<=5;i++) B.box(0.1,2.95,0.07,opts.glassEnd,Y0,zA+d*i/5,C.alu);
   }
 }
-function moduleBlock(m){ bar(m.nw); bar(m.se); connector(m.cx0,m.cx1,m.nw.z1,m.se.z0,m.conn||{}); }
 
+// As salas ficam em duas fileiras alinhadas, com um corredor de 7,5 m entre elas.
+// Fileira noroeste (à direita de quem entra pelo arco): 3, 5 e 7/8.
+// Fileira sudeste (à esquerda): 1, 2, 4 e 6. Os números olham para quem entra;
+// só o 8 fica na ponta oposta, virado para o fundo.
+const ZNW0=-9.75, ZNW1=-5.25, ZSE0=2.25, ZSE1=6.75;
 // Módulo A — blocos 1, 2 e 3 (mais perto do arco)
-moduleBlock({
-  nw:{x0:-2.2,x1:9.9,z0:-9.8,z1:-5.4,inner:1,clad:'#f0a21c',numNE:{t:'3',c:'#e8a927'}},
-  se:{x0:-2.2,x1:11.2,z0:-0.5,z1:3.8,inner:-1,clad:'#e0521f',shutter:true,numNE:{t:'1',c:'#df3b26'},numSW:{t:'2',c:'#2d6fb8'}},
-  cx0:-2.2,cx1:0.9
-});
-// Módulo B — blocos 4, 5 e 6
-moduleBlock({
-  nw:{x0:-24.5,x1:-12,z0:-6.9,z1:-2.0,inner:1,clad:'#3a9e48',numNE:{t:'5',c:'#35b536'},numSW:{t:'6',c:'#e8741f'}},
-  se:{x0:-24.5,x1:-10.9,z0:2.3,z1:6.7,inner:-1,clad:'#7a3d93',shutter:true,numNE:{t:'4',c:'#6a2c70'}},
-  cx0:-24.5,cx1:-20.7
-});
-// Módulo C — blocos 7 e 8 (ponta sudoeste)
-moduleBlock({
-  nw:{x0:-45.4,x1:-31.7,z0:-4.1,z1:1.0,inner:1,clad:'#c2406f',numSW:{t:'8',c:'#f4f4f2'},fullClad:{c:'#cf4a7e',face:'nx'}},
-  se:{x0:-45.4,x1:-31.0,z0:4.1,z1:8.2,inner:-1,clad:'#1f8a97',numNE:{t:'7',c:'#7b2f5e'},fullClad:{c:'#2a93a0',face:'nx'}},
-  cx0:-45.4,cx1:-41.7, conn:{glassEnd:-45.1}
-});
+bar({x0:-2.2,x1:9.9,z0:ZNW0,z1:ZNW1,inner:1,clad:'#f0a21c',numNE:{t:'3',c:'#e8a927'}});
+bar({x0:5.2,x1:11.2,z0:ZSE0,z1:ZSE1,inner:-1,clad:'#e0521f',shutter:true,cladW:1.3,numNE:{t:'1',c:'#df3b26'}});
+bar({x0:-2.2,x1:3.2,z0:ZSE0,z1:ZSE1,inner:-1,clad:'#2d6fb8',cladW:1.2,numNE:{t:'2',c:'#2d6fb8'}});
+connector(-2.2,0.9,ZNW1,ZSE0);
+// Módulo B — blocos 4 e 5
+bar({x0:-24.5,x1:-12,z0:ZNW0,z1:ZNW1,inner:1,clad:'#3a9e48',numNE:{t:'5',c:'#35b536'}});
+bar({x0:-24.5,x1:-10.9,z0:ZSE0,z1:ZSE1,inner:-1,clad:'#7a3d93',shutter:true,numNE:{t:'4',c:'#8e2f52'}});
+connector(-24.5,-20.7,ZNW1,ZSE0);
+// Módulo C — blocos 6, 7 e 8 (ponta sudoeste): 8 rosa na ponta do fundo, fundo do 6 azul-petróleo
+bar({x0:-45.4,x1:-31.7,z0:ZNW0,z1:ZNW1,inner:1,clad:'#c2406f',numNE:{t:'7',c:'#9b2f45'},numSW:{t:'8',c:'#f4f4f2'},fullClad:{c:'#cf4a7e',face:'nx'}});
+bar({x0:-45.4,x1:-31.0,z0:ZSE0,z1:ZSE1,inner:-1,clad:'#1f8a97',numNE:{t:'6',c:'#2f6fc0'},fullClad:{c:'#2a93a0',face:'nx'}});
+connector(-45.4,-41.7,ZNW1,ZSE0,{glassEnd:-45.1});
 // caixa d'água sobre o bloco 8 (vista na aérea)
-B.box(1.4,0.9,1.2,-41.5,Y0+H,-2.8,'#eceeed');
+B.box(1.4,0.9,1.2,-41.5,Y0+H,-7.5,'#eceeed');
 // mureta de concreto na borda da praça sudoeste (foto do bloco 8)
-B.box(0.35,0.35,5.5,-46.2,0.15,-1.6,C.concrete); B.box(0.35,0.35,4.2,-46.2,0.15,7.3,C.concrete);
+B.box(0.35,0.35,4.5,-46.2,0.15,-7.5,C.concrete); B.box(0.35,0.35,4.5,-46.2,0.15,4.5,C.concrete);
 
-// ---------- pátios, canteiros e bancos ----------
+// ---------- pátios, jardins e bancos ----------
+// Os jardins são rentes ao chão; só o canteiro em L da entrada (foto 5) e a floreira
+// redonda sob a cobertura do módulo A (fotos 2 e 8) são elevados.
 // praça de entrada
-planter(16,22.2,-4.4,-1.8,0.95,'dracena');                 // canteiro grande com dracenas (foto 5)
-benchBlock(19.1,-1.45,6.2,0.6); benchBlock(22.5,-3.1,0.6,3.3);
-lawn(15.5,20,-9.7,-6.8); tree(17.6,-8.3,5.2,2.4);
-planter(12.4,14.5,-8.6,-6.2,0.5,'shrub');
-lawn(10.1,11.4,-9.2,-5.8); for(let z=-8.8;z<-6;z+=0.8) shrub(10.75,0.27,z,.35);
-lawn(16.8,23.4,-0.6,1.4); for(let x=17.5;x<23;x+=1.4) shrub(x,0.27,R(-.2,.8),R(.25,.4));
-planter(11.8,12.9,1.3,3.6,0.5,'shrub');
+planter(16.5,22.5,-7.6,-5.2,0.95,'dracena');               // canteiro em L com dracenas (foto 5)
+planter(21.1,22.5,-8.9,-7.6,0.95,'dracena');
+benchBlock(18.8,-4.85,4.4,0.6); benchBlock(22.85,-7.0,0.6,2.2);
+gbed(11.8,15.8,-10,-7.6,'shrub'); tree(13.8,-8.8,5.2,2.4,'round',0.19);
+lawn(10.2,11.4,-9.6,-5.4); for(let z=-9.2;z<-5.6;z+=0.8) shrub(10.8,0.19,z,.35);
+lawn(16.8,23.4,1.6,3.6); for(let x=17.5;x<23;x+=1.4) shrub(x,0.19,R(2.2,3),R(.25,.4));
+gbed(12.2,13.4,2.6,5.4,'shrub');
 // círculo de concreto com árvore (foto 7, à esquerda)
 {B.cyl(1.7,1.7,0.45,20,27.6,0.15,0.2,C.concrete);B.cyl(1.25,1.25,0.02,20,27.6,0.6,0.2,C.grassD);tree(27.6,0.2,5.5,2.6,'round',0.6);}
-// canteiro com capim sob o arco
-{B.box(3.6,0.12,1.3,28.3,0.15,-5.4,C.concrete);B.box(3.4,0.05,1.1,28.3,0.27,-5.4,C.soil);for(let x=26.9;x<30;x+=0.7)grassTuft(x,0.3,-5.4+R(-.2,.2),R(1,1.4));}
-// canteiro da totem (grama com borda branca)
-{B.box(2.1,0.1,5.9,32.35,0.15,0.05,C.grass,0,.1);for(let z=-2.5;z<2.8;z+=0.9)if(rand()<.7)grassTuft(32.2+R(-.5,.5),0.25,z,R(.5,.8),'#4f8a2c');}
-// módulo A — pátio interno
-roundPlanter(6.6,-3.0,1.05,false,2.6);
-benchBlock(8.4,-1.25,2.2,0.55); benchBlock(3.2,-4.7,2.2,0.55);
-roundPlanter(-0.7,-3.0,1.15,true,2.0);                     // sob a cobertura de ligação (fotos 2 e 8)
-// pátio B–A
-lawn(-9.6,-3.6,-5.7,-3.4); for(let i=0;i<5;i++) shrub(R(-9.2,-4),0.27,R(-5.4,-3.7),R(.3,.5));
-planter(-11,-3.2,-1.4,0.8,0.5,'dracena');
-lawn(-10.9,-9.9,3.2,5.8);
+// faixa de capim no chão, sob o arco (foto da rua)
+gbed(27.6,31.0,-6.9,-5.7,'soil'); for(let x=28.0;x<30.8;x+=0.55) grassTuft(x,0.19,-6.3+R(-.2,.2),R(1,1.4));
+// canteiro do totem: grama rente com meio-fio branco e touceiras
+lawn(31.2,33.3,-2.5,3.4);
+for(let z=-2.2;z<3.2;z+=0.55) if(rand()<.75) grassTuft(31.5+R(0,.25),0.2,z,R(.5,.8),'#4f8a2c');
+for(const z of[-1.9,1.2,2.8]) shrub(33.0,0.2,z,.28,'#5d8f33');
+// corredor do módulo A
+roundPlanter(-0.7,-1.5,1.15,true,2.0);                     // sob a cobertura de ligação (fotos 2 e 8)
+roundPlanter(7.4,-1.5,1.05,false,2.6);
+benchBlock(3.6,-1.5,2.6,0.6);
+// pátio A–B
+lawn(-9.6,-3.8,2.8,6.2); for(let i=0;i<5;i++) shrub(R(-9.2,-4.2),0.19,R(3.1,5.9),R(.3,.5));
+gbed(-9.6,-3.8,-9.4,-6.4,'dracena');
+benchBlock(-6.7,-1.5,2.6,0.6);
 bin(-12.4,-1.6); bin(10.3,-7.3); bin(11.6,3.4); bin(-31.3,0.8);
-// módulo B — pátio interno
-planter(-17.8,-13.2,-1.1,1.1,0.55,'dracena');
-// pátio C–B
-lawn(-31.6,-30.2,-3.4,0.8); for(let z=-3;z<0.6;z+=0.9) grassTuft(-30.9,0.27,z,.9);
-planter(-29.6,-27.4,-3.3,-0.7,0.55,'dracena');
-planter(-29.2,-27.8,4.6,6.6,0.5,'shrub');
-benchBlock(-28.3,7.6,2.4,0.55);
-// módulo C — pátio interno
-planter(-38.4,-34.3,3.1,4.0,0.45,'shrub');
+// corredor do módulo B (foto do corredor: bancos de concreto e gramado no chão)
+benchBlock(-14.6,-2.5,2.6,0.6); benchBlock(-18.6,-0.5,2.6,0.6);
+lawn(-18.2,-15.4,0.8,1.9); gbed(-17.4,-15.6,-4.7,-3.6,'shrub');
+// pátio B–C
+lawn(-30.6,-28.6,-5.0,-2.6); for(let z=-4.7;z<-2.8;z+=0.7) grassTuft(-29.6,0.19,z,.9);
+gbed(-30.6,-27.8,-0.8,1.6,'dracena');
+benchBlock(-26.2,-1.5,0.6,2.4);
+// corredor do módulo C
+gbed(-38.4,-34.3,0.8,1.8,'shrub'); benchBlock(-36.4,-2.8,2.6,0.6);
 // postes de luz (dois globos)
-for(const[x,z]of[[12.9,2.2],[24.2,-9.3],[-11.6,-6.8],[-10.4,6.8],[-30.4,-6.8],[-30.2,8.6],[-50,-3.9],[-56,-3.9],[-61,-3.6],[-48,10.4],[-58,10.8],[2.2,4.9],[4.5,-10.2]]) lamp(x,z);
+for(const[x,z]of[[12.9,2.2],[24.2,-9.3],[-11.6,-6.8],[-10.4,6.8],[-30.4,-6.8],[-30.2,8.6],[-50,-9.6],[-56,-9.2],[-61,-3.6],[-48,10.4],[-58,10.8],[4.5,-10.4]]) lamp(x,z);
 
 // ---------- tenda branca (fotos 5 e 6) ----------
 function tent(x,z,s=4.8,h=2.5){
@@ -537,47 +546,69 @@ function tent(x,z,s=4.8,h=2.5){
   // treliça interna
   for(const dx of[-1,1]) B.beam(new THREE.Vector3(x+dx*s/2,0.15+h,z-s/2),new THREE.Vector3(x-dx*s/2,0.15+h,z+s/2),0.04,'#9fa3a6');
 }
-tent(12.8,-3.0);
+tent(13.8,-1.0);
 
 // ---------- ARCO ARCO-ÍRIS da entrada ----------
 // 9 pórticos metálicos, do mais externo (azul, junto à rua) ao mais interno (azul-claro).
 // Azul e verdes: pilar só do lado sudeste (balanço para o noroeste).
 // Vermelho e laranjas: pórtico completo. Roxos e azul-claro: pilar só do lado noroeste.
 const ARCH=[['#1f58a8','se'],['#1e8a3d','se'],['#2aa04b','se'],['#d2232c','full'],['#e8701b','full'],['#f39a1e','full'],['#6b3993','nw'],['#8a5ec0','nw'],['#4f8fd9','nw']];
-// medido na aérea: vão de 4,5 m (z -3,45 a -7,95), 9 pórticos a cada 0,62 m
+// vão de 6,2 m (z -2,9 a -9,1), 9 pórticos a cada 0,62 m; as vigas em L dos azuis/verdes
+// vão até perto dos pilares roxos, e as dos roxos avançam uns 2,7 m (foto da rua)
 ARCH.forEach(([col,type],i)=>{
-  const x=30.2-i*0.62, h=4.35-0.07*i, zse=-3.45, znw=-7.95, t=0.22;
+  const x=30.2-i*0.62, h=4.35-0.07*i, zse=-2.9, znw=-9.1, t=0.22;
   let za=zse, zb=znw;
-  if(type==='se'){ B.box(t,h,t,x,0.15,zse,col); zb=zse-2.55; }
-  if(type==='nw'){ B.box(t,h,t,x,0.15,znw,col); za=znw+2.3; }
+  if(type==='se'){ B.box(t,h,t,x,0.15,zse,col); zb=zse-3.9; }
+  if(type==='nw'){ B.box(t,h,t,x,0.15,znw,col); za=znw+2.7; }
   if(type==='full'){ B.box(t,h,t,x,0.15,zse,col); B.box(t,h,t,x,0.15,znw,col); }
   B.box(t,t,Math.abs(za-zb)+t,x,0.15+h-t,(za+zb)/2,col);
 });
-// totem FAPEMIG / Unimontes e placa do Circuito
-const fapTex=canvasTex(256,640,(g,w,h)=>{
-  g.fillStyle='#1f3f8e';g.fillRect(0,0,w,h);
-  g.strokeStyle='#fff';g.lineWidth=10;
-  g.beginPath();g.arc(128,120,42,0,2*PI);g.stroke();g.beginPath();g.moveTo(96,120);g.bezierCurveTo(110,70,146,170,160,120);g.stroke();
-  g.fillStyle='#fff';g.textAlign='center';g.font='bold 44px Arial,sans-serif';g.fillText('FAPEMIG',128,215);
-  g.beginPath();g.arc(128,315,36,0,2*PI);g.stroke();g.beginPath();g.moveTo(98,315);g.lineTo(158,315);g.stroke();
-  g.font='bold 40px Arial,sans-serif';g.fillText('Unimontes',128,395);
+// totem FAPEMIG / Unimontes: laje azul texturizada, atrás e à esquerda da placa
+const fapTex=canvasTex(320,840,(g,w,h)=>{
+  g.fillStyle='#1d3f93';g.fillRect(0,0,w,h);
+  for(let i=0;i<6000;i++){g.fillStyle=rand()<.5?'rgba(255,255,255,0.07)':'rgba(0,0,40,0.14)';g.fillRect(rand()*w,rand()*h,2+rand()*3,2+rand()*3);}
+  g.strokeStyle='#fff';g.fillStyle='#fff';g.lineWidth=7;g.lineCap='round';g.lineJoin='round';g.textAlign='center';
+  for(let k=0;k<3;k++){g.beginPath();g.ellipse(160,165,48,30,k*PI/3,0,2*PI);g.stroke();}   // laços da FAPEMIG
+  g.font='bold 50px Arial,sans-serif';g.fillText('FAPEMIG',160,268);
+  g.lineWidth=11;                                                                            // fita em "m" da Unimontes
+  g.beginPath();g.moveTo(112,432);g.lineTo(112,402);g.arc(136,402,24,PI,0);g.lineTo(160,432);g.moveTo(160,402);g.arc(184,402,24,PI,0);g.lineTo(208,432);g.stroke();
+  g.beginPath();g.moveTo(104,446);g.quadraticCurveTo(160,470,216,446);g.stroke();
+  g.font='bold 44px Arial,sans-serif';g.fillText('Unimontes',160,505);
 });
-B.box(0.4,3.6,1.35,32.75,0.25,1.9,'#1f3f8e');
-decal(fapTex,1.3,3.25,32.97,0.25+1.9,1.9,FACE.px);
-const circTex=canvasTex(512,360,(g,w,h)=>{
-  g.fillStyle='#f7f7f5';g.fillRect(0,0,w,h);
-  g.lineWidth=26;g.strokeStyle='#3f9a3a';
-  g.beginPath();g.ellipse(170,110,95,62,0,0,2*PI);g.stroke();g.beginPath();g.ellipse(342,110,95,62,0,0,2*PI);g.stroke();
-  g.lineWidth=6;g.strokeStyle='#e8f4e2';g.setLineDash([10,10]);
-  g.beginPath();g.ellipse(170,110,95,62,0,0,2*PI);g.stroke();g.beginPath();g.ellipse(342,110,95,62,0,0,2*PI);g.stroke();g.setLineDash([]);
-  g.fillStyle='#1d5a2b';g.textAlign='center';g.font='bold 54px Arial,sans-serif';g.fillText('CIRCUITO DE',256,245);g.fillText('CONHECIMENTOS',256,310);
+B.box(0.45,3.9,1.5,31.9,0.15,1.6,'#1d3f93',0,.01);
+decal(fapTex,1.5,3.9,32.14,0.15+1.95,1.6,FACE.px);
+// placa branca do Circuito: bloco grosso com o infinito ilustrado
+const circTex=canvasTex(640,498,(g,w,h)=>{
+  g.fillStyle='#f6f6f3';g.fillRect(0,0,w,h);
+  const cx=320,cy=172,a=255, P=[];
+  for(let i=0;i<=240;i++){const t=i/240*2*PI,d=1+Math.sin(t)**2;P.push([cx+a*Math.cos(t)/d,cy+a*0.95*Math.sin(t)*Math.cos(t)/d]);}
+  const path=()=>{g.beginPath();P.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();};
+  g.lineJoin='round';g.lineWidth=84;g.strokeStyle='#3f7f2f';path();g.stroke();
+  g.lineWidth=70;g.strokeStyle='#6aaa42';path();g.stroke();
+  // bichos, folhas e flores miúdos dentro da faixa
+  const cols=['#2f6b2a','#a6d474','#5b2a6e','#ffffff','#3f7f2f','#c4e39a','#7d3f8f'];
+  for(let i=0;i<420;i++){
+    const [x,y]=P[Math.floor(rand()*P.length)], ox=(rand()-.5)*62, oy=(rand()-.5)*62;
+    g.fillStyle=cols[Math.floor(rand()*cols.length)];
+    g.save();g.translate(x+ox,y+oy);g.rotate(rand()*PI);
+    if(rand()<.5){g.beginPath();g.ellipse(0,0,3+rand()*7,2+rand()*3,0,0,2*PI);g.fill();}
+    else {g.beginPath();g.arc(0,0,2+rand()*4,0,2*PI);g.fill();}
+    g.restore();
+  }
+  g.lineWidth=4;g.strokeStyle='#2f5f28';
+  g.textAlign='center';g.textBaseline='alphabetic';
+  g.fillStyle='#5b2a6e';g.font='900 74px Arial,sans-serif';g.fillText('CIRCUITO DE',320,378);
+  const wAll=g.measureText('CIRCUITO DE').width, wDe=g.measureText('DE').width;
+  g.fillStyle='#5d9c34';g.fillRect(320+wAll/2-wDe,390,wDe,9);
+  g.font='900 64px Arial,sans-serif';g.fillText('CONHECIMENTOS',320,462);
 });
-B.box(0.25,1.6,2.3,32.7,0.25,-0.3,'#f7f7f5');
-decal(circTex,2.3,1.6,32.84,0.25+0.8,-0.3,FACE.px);
+B.box(0.45,2.1,2.7,32.8,0.15,-0.2,'#f3f3f0',0,.01);
+B.box(0.47,0.06,2.72,32.8,2.22,-0.2,'#dcdcd8');
+decal(circTex,2.7,2.1,33.035,0.15+1.05,-0.2,FACE.px);
 // armário técnico cinza coberto de trepadeira
 B.box(1.1,2.6,1.1,29.6,0.15,-1.7,'#8e9295'); for(let i=0;i<7;i++) shrub(29.6+R(-.5,.6),R(1,2.4),-1.7+R(-.6,.6),R(.3,.5),'#3f7b28');
 // carteira escolar no canteiro
-{const x=32.4,z=-2.25; B.box(0.45,0.04,0.45,x,0.6,z,'#e6e2da'); B.box(0.45,0.5,0.04,x-0.22,0.64,z,'#e6e2da'); B.box(0.5,0.03,0.35,x+0.05,0.85,z+0.3,'#2b2b2b');
+{const x=32.5,z=-2.1; B.box(0.45,0.04,0.45,x,0.6,z,'#e6e2da'); B.box(0.45,0.5,0.04,x-0.22,0.64,z,'#e6e2da'); B.box(0.5,0.03,0.35,x+0.05,0.85,z+0.3,'#2b2b2b');
  for(const dx of[-.2,.2])for(const dz of[-.2,.2]) B.box(0.03,0.6,0.03,x+dx,0.15,z+dz,C.black);}
 // placa PELD
 const peldTex=canvasTex(256,420,(g,w,h)=>{
@@ -770,12 +801,12 @@ for(let x=-95;x<-40;x+=3){ B.box(3,2.4,0.2,x+1.5,0,19.4,'#9d9f9c',0,.02); B.box(
 
 // ---------- árvores (posições medidas na aérea) ----------
 const TREES=[
-  // lado SE da ilha
-  [-56,9.5,7,3.5],[-44,10.2,8,4],[-38,9.8,8.5,4.2],[-33,9.9,7.5,3.8],[-28,9.4,8,4],[-22.5,8.6,8,4.2],[-18,8.3,7,3.5],[-14.5,7.8,7.5,3.8],
-  [-7,7.3,8,4.3],[-3,6.6,6,3],[6.5,5.9,7.5,4],[10.5,5.8,8,4.2],[14.8,5.2,6.5,3.2],[21,4.1,6,3],[31.6,0.9,9,4.8],
-  // lado NO da ilha
-  [-58,-3.2,6,3],[-36,-6.9,7,3.5],[-29.4,-8.1,7.5,3.8],[-18.6,-8.2,7,3.6],[-8,-8.6,6,3],[-4.8,-10.1,7,3.4],
-  [9.2,-13.2,7.5,4],[14,-13.8,7,3.5],[18,-14.2,8,4.2],[22.6,-13,8.5,4.6],[29.2,-9.1,7,3.5],
+  // lado SE da ilha (atrás da fileira sudeste)
+  [-56,10.5,7,3.5],[-44,10.9,8,4],[-38,10.6,8.5,4.2],[-33,10.4,7.5,3.8],[-28,9.9,8,4],[-22.5,9.5,8,4.2],[-18,9.3,7,3.5],[-14.5,9.1,7.5,3.8],
+  [-7,8.7,8,4.3],[-3,8.5,6,3],[6.5,8.3,7.5,4],[10.5,8.1,8,4.2],[14.8,6.9,6.5,3.2],[21,5.5,6,3],[31.2,-1.9,9,4.8],
+  // lado NO da ilha (atrás da fileira noroeste)
+  [-58,-3.2,6,3],[-36,-11.9,7,3.5],[-29.4,-9.2,7.5,3.8],[-18.6,-11.9,7,3.6],[-8,-9.2,6,3],[-4.8,-10.9,7,3.4],
+  [9.2,-13.4,7.5,4],[14,-13.8,7,3.5],[18,-14.2,8,4.2],[22.6,-13,8.5,4.6],[28.6,-10.6,7,3.5],
 ];
 for(const t of TREES) tree(...t);
 // canteiro central do estacionamento NO
@@ -818,13 +849,15 @@ const VIEWS={
   frente:  {label:'Frente (foto 10)',     pos:[32.9,1.6,-4.6],  look:[44,2.6,-4.4],  fov:62},
   direita: {label:'Direita (foto 11)',    pos:[37.0,1.6,-2.5],  look:[45,5.5,14],    fov:62},
   esquerda:{label:'Esquerda (foto 12)',   pos:[34.2,1.6,-1.4],  look:yawLook([34.2,1.6,-1.4],-24), fov:55},
-  entrada: {label:"Entrada (arco)",      pos:[37.4,1.6,-4.6],  look:[26,2.2,-5.6],  fov:58},
+  entrada: {label:"Entrada (arco)",      pos:[38.8,1.6,-5.2],  look:[26,2.2,-5.8],  fov:58},
+  fachada: {label:'Totem e placa',       pos:[38.2,1.5,-1.2],  look:[32.4,1.6,0.6], fov:60},
   panorama:{label:'Rua do arco',         pos:[37.2,1.6,1.5],   look:[20,1.8,-6],    fov:70},
   aerea:   {label:'Vista aérea',         pos:[-6,125,0.1],     look:[-6,0,0],       fov:50},
   geral:   {label:'Visão geral',         pos:[66,58,-44],      look:[-6,0,0],      fov:55},
-  patio13: {label:'Blocos 1 e 3',        pos:[26.5,1.6,-0.2],  look:[0,2.2,-3],       fov:62},
-  blocos45:{label:'Blocos 4 e 5',        pos:[4.5,1.6,-3.0],   look:[-14,1.8,0.8], fov:66},
-  bloco8:  {label:'Bloco 8',             pos:[-61,1.6,8.5],    look:[-45,2,1.2],    fov:66},
+  patio13: {label:'Blocos 1 e 3',        pos:[26.5,1.6,-2.2],  look:[0,2.2,-1.5],   fov:62},
+  blocos45:{label:'Blocos 4 e 5',        pos:[4.5,1.6,-3.4],   look:[-14,1.8,-1.5], fov:66},
+  corredor:{label:'Corredor (4, 6 e 7)', pos:[-4.0,1.6,-2.8],  look:[-40,1.8,0.2],  fov:60},
+  bloco8:  {label:'Bloco 8',             pos:[-60,1.6,3.0],    look:[-45,2,-6.5],   fov:66},
 };
 let current='';
 function setView(k){
